@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    datasets = db.relationship('Dataset', backref='owner', lazy='dynamic')
 
     @property
     def password(self):
@@ -67,6 +68,45 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+class Project(db.Model):
+    __tablename__ = 'projects'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, index=True)
+    datasets = db.relationship('Dataset', backref='project', lazy='dynamic')
+
+class Location(db.Model):
+    __tablename__ = 'locations'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, index=True)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    datasets = db.relationship('Dataset', backref='location', lazy='dynamic')
+
+class Parameter(db.Model):
+    __tablename__ = 'parameters'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(16), unique=True)
+    units = db.Column(db.String(16), unique=True)
+    description = db.Column(db.String(64), unique=True)
+
+class Dataset(db.Model):
+    __tablename__ = 'datasets'
+    id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(db.DateTime())
+    end_date = db.Column(db.DateTime())
+    values = db.relationship('Value', backref='dataset', lazy='dynamic')
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class Value(db.Model):
+    __tablename__ = 'values'
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime())
+    value = db.Column(db.Float)
+    parameter_id = db.Column(db.Integer, db.ForeignKey('parameters.id'))
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
 
 @login_manager.user_loader
 def load_user(user_id):
