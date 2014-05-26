@@ -1,57 +1,71 @@
 Open Water Data Platform
 ========================
 
+This repo contains files for the Open Water Data Platform (which may be renamed at some point in the future). This is part of the Public Lab's [Open Water](http://publiclab.org/wiki/open-water) and [Riffle](http://publiclab.org/wiki/riffle) Projects.
+
+## Overview
+
+This application runs on flask and is configured for deployment to Heroku. Data files are stored on Amazon S3.
+
 ## Environmental Variables
 
-FLASK_CONFIG
-DATABASE_URL
-SECRET_KEY
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-MAIL_SERVER
-MAIL_PORT
-MAIL_USE_TLS
-MAIL_USERNAME
-MAIL_PASSWORD
+Sensitive configuration settings must be set as environmental variables. These include:
 
-Generate Flask Secret Key
->>> import os
->>> os.urandom(24)
-'\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+FLASK_CONFIG: Config class, e.g. development, production, heroku. see config.py
+DATABASE_URL: URI to database for SQLAlchemy
+SECRET_KEY: Flask secret key
+AWS_ACCESS_KEY_ID: Amazon AWS Access Key
+AWS_SECRET_ACCESS_KEY: Amazon AWS Secret Key
+S3_BUCKET: AWS S3 bucket name
+MAIL_SERVER: SMTP server name
+MAIL_PORT: SMTP port name
+MAIL_USE_TLS: SMTP TLS option (True/False)
+MAIL_USERNAME: SMTP username
+MAIL_PASSWORD: SMTP password
+
+## Development Server
+
+To run a local web server:
+
+    python manage.py runserver -d -r
+
+To access the shell with bindings for app, db, and various Models
+
+    python manage.py shell
+
+To initialize the database
+
+    python manage.py deploy
 
 ## Setting up Heroku
 
-create Procfile
+make sure Procfile contains this line:
 
     web: gunicorn manage:app
 
-login to heroku
+login to heroku, enter username and password
 
     heroku login
 
-create application
+create application where <app_name> is the name of the heroku application (e.g. open-water-demo)
 
     heroku create <app_name>
 
-add database
+add PostgreSQL database addon
 
     heroku addons:add heroku-postgresql:dev
 
-promote database (sets the URI to DATABASE_URL)
+promote PostgreSQL database (sets the URI to DATABASE_URL), note replace <COLOR>
 
     heroku pg:promote HEROKU_POSTGRESQL_<COLOR>_URL
 
-set environmental variables (see above, do all *except* DATABASE_URL)
+set environmental variables on heroku (see above, do all *except* DATABASE_URL)
 
     heroku config:set NAME=value
 
-make sure requirements.txt exists in top level
+make sure requirements.txt exists in top level, which Heroku uses to install dependencies
 
-test with foreman (first copy all environmental variables to .env file in top level)
-
-    foreman start
-
-upload with git
+push to Heroku using git
 
     git push heroku master
 
