@@ -15,7 +15,11 @@ class Config:
     S3_UPLOAD_DIRECTORY = 'csvfiles'
     S3_BUCKET = os.environ.get('S3_BUCKET')
 
-    UPLOADED_CSVFILES_DEST = os.path.join(basedir, 'uploads')
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = os.environ.get('MAIL_PORT')
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
     @staticmethod
     def init_app(app):
@@ -23,11 +27,6 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = os.environ.get('MAIL_PORT')
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS')
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'open-water-dev.sqlite')
 
