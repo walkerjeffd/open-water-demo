@@ -2,9 +2,8 @@ from . import db, login_manager
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin
-from flask import current_app, request, url_for
+from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
