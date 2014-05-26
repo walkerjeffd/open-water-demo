@@ -58,8 +58,9 @@ def upload_dataset():
     if form.validate_on_submit():
         try:
             source_filename, file_url = s3_upload(request.files['file'])
-        except Exception:
+        except Exception as e:
             flash('Error uploading file, contact administrator.')
+            raise e
             return redirect(url_for('.upload_dataset'))
         dataset = Dataset(location_id=form.location.data,
                           project_id=form.project.data,
