@@ -5,10 +5,7 @@ from flask.ext.moment import Moment
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.admin import Admin
-from flask.ext.uploads import UploadSet, configure_uploads
 from config import config
-
-csvfiles = UploadSet('csvfiles', ('csv',))
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -31,8 +28,6 @@ def create_app(config_name):
     db.init_app(app)
     admin.init_app(app)
     login_manager.init_app(app)
-
-    configure_uploads(app, (csvfiles,))
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

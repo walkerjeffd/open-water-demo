@@ -1,9 +1,10 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask.ext.login import login_required, current_user
 from . import main
-from .. import db, admin, csvfiles
+from .. import db, admin
 from ..models import User, Location, Dataset, Project
 from .forms import EditProfileForm, UploadDatasetForm
+from .tools import s3_upload, s3_url
 from flask.ext.admin.contrib.sqla import ModelView
 
 @main.route('/')
@@ -41,24 +42,30 @@ def dataset_list():
 @login_required
 def dataset_detail(id):
     dataset = Dataset.query.get_or_404(id)
-    fileurl = csvfiles.url(dataset.filename)
-    filepath = csvfiles.path(dataset.filename)
-    import csv
-    with open(filepath, 'rb') as csvfile:
-        reader = csv.reader(csvfile)
-        rows = [row for row in reader]
-    return render_template('dataset_detail.html', dataset=dataset, fileurl=fileurl, headers=rows[0], rows=rows[1:100])
+    # fileurl = csvfiles.url(dataset.filename)
+    # filepath = csvfiles.path(dataset.filename)
+    # import csv
+    # with open(filepath, 'rb') as csvfile:
+    #     reader = csv.reader(csvfile)
+    #     rows = [row for row in reader]
+    # return render_template('dataset_detail.html', dataset=dataset, fileurl=fileurl, headers=rows[0], rows=rows[1:100])
+    return render_template('dataset_detail.html', dataset=dataset, headers=[], rows=[])
 
 @main.route('/upload-dataset', methods=['GET', 'POST'])
 @login_required
 def upload_dataset():
     form = UploadDatasetForm(user=current_user)
     if form.validate_on_submit():
-        filename = csvfiles.save(request.files['file'])
+        try:
+            source_filename, file_url = s3_upload(request.files['file'])
+        except Exception:
+            flash('Error uploading file, contact administrator.')
+            return redirect(url_for('.upload_dataset', id=dataset.id))
         dataset = Dataset(location_id=form.location.data,
                           project_id=form.project.data,
-                          filename=filename,
-                      user_id=current_user.id)
+                          source_filename=source_filename,
+                          file_url = file_url,
+                          user_id=current_user.id)
         db.session.add(dataset)
         db.session.commit()
         flash('The dataset has been uploaded.')

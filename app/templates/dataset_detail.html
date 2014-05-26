@@ -6,7 +6,7 @@
     <li>Location: {{ dataset.location.name }}</li>
     <li>Project: {{ dataset.project.name }}</li>
     <li>User: {{ dataset.user.name }}</li>
-    <li>File: <a href="{{ fileurl }}">{{ dataset.filename }}</a></li>
+    <li>File: <a href="{{ dataset.file_url }}" download="filename">{{ dataset.source_filename }}</a></li>
 </ul>
 
 <table class="table table-striped">

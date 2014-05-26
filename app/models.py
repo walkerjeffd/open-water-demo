@@ -104,7 +104,8 @@ class Dataset(db.Model):
     __tablename__ = 'datasets'
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime(), default=datetime.utcnow)
-    filename = db.Column(db.String(128))
+    source_filename = db.Column(db.String(128))
+    file_url = db.Column(db.String(128))
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
     values = db.relationship('Value', backref='dataset', lazy='dynamic')
