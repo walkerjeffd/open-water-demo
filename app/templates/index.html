@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <h1>Hello World!</h1>
+    <h1>Open Water Data Platform (DEMO)</h1>
+
+    {% if current_user.is_authenticated() %}
+        <p>You are logged in. Go <a href="{{ url_for('main.dataset_list') }}">check out your datasets</a>!</p>
+    {% else %}
+        <p>You are not logged in. Go <a href="{{ url_for('auth.register') }}">Register</a> or <a href="{{ url_for('auth.login') }}">Log In</a>.
+    {% endif %}
 {% endblock %}
