@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin
 from flask import current_app, request, url_for
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -17,7 +18,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-    datasets = db.relationship('Dataset', backref='owner', lazy='dynamic')
+    datasets = db.relationship('Dataset', backref='user', lazy='dynamic')
 
     @property
     def password(self):
@@ -75,6 +76,9 @@ class Project(db.Model):
     name = db.Column(db.String(64), unique=True, index=True)
     datasets = db.relationship('Dataset', backref='project', lazy='dynamic')
 
+    def __repr__(self):
+        return '<Project %s>' % self.name
+
 class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
@@ -83,6 +87,9 @@ class Location(db.Model):
     longitude = db.Column(db.Float)
     datasets = db.relationship('Dataset', backref='location', lazy='dynamic')
 
+    def __repr__(self):
+        return '<Location %s>' % self.name
+
 class Parameter(db.Model):
     __tablename__ = 'parameters'
     id = db.Column(db.Integer, primary_key=True)
@@ -90,15 +97,23 @@ class Parameter(db.Model):
     units = db.Column(db.String(16), unique=True)
     description = db.Column(db.String(64), unique=True)
 
+    def __repr__(self):
+        return '<Parameter %s (%s)>' % (self.name, self.units)
+
 class Dataset(db.Model):
     __tablename__ = 'datasets'
     id = db.Column(db.Integer, primary_key=True)
+    created = db.Column(db.DateTime(), default=datetime.utcnow)
+    filename = db.Column(db.String(128))
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
     values = db.relationship('Value', backref='dataset', lazy='dynamic')
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return '<Dataset %d>' % (self.id)
 
 class Value(db.Model):
     __tablename__ = 'values'
@@ -107,6 +122,7 @@ class Value(db.Model):
     value = db.Column(db.Float)
     parameter_id = db.Column(db.Integer, db.ForeignKey('parameters.id'))
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
+
 
 @login_manager.user_loader
 def load_user(user_id):

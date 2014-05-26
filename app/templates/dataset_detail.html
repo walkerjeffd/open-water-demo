@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1>Dataset: {{ dataset.id }}</h1>
+<ul>
+    <li>Location: {{ dataset.location.name }}</li>
+    <li>Project: {{ dataset.project.name }}</li>
+    <li>User: {{ dataset.user.name }}</li>
+    <li>File: <a href="{{ fileurl }}">{{ dataset.filename }}</a></li>
+</ul>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            {% for header in headers %}
+                <th>{{header}}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                {% for value in row %}
+                    <td>{{value}}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+{% endblock %}

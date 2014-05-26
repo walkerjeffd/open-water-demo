@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1>Your Datasets</h1>
+{% if datasets %}
+    <ul>
+    {% for dataset in datasets %}
+        <li><a href="{{ url_for('.dataset_detail', id=dataset.id) }}">Dataset {{ dataset.id }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+<p>No datasets available.</p>
+{% endif %}
+<a href="{{ url_for('.upload_dataset') }}" class="btn btn-default">New Dataset</a>
+{% endblock %}

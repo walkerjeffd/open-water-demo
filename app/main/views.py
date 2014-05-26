@@ -1,10 +1,10 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from flask.ext.login import login_required, current_user
 from . import main
-from .. import db
-from ..models import User
-from .forms import EditProfileForm
-
+from .. import db, admin, csvfiles
+from ..models import User, Location, Dataset, Project
+from .forms import EditProfileForm, UploadDatasetForm
+from flask.ext.admin.contrib.sqla import ModelView
 
 @main.route('/')
 def index():
@@ -30,3 +30,42 @@ def edit_profile():
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', form=form)
+
+@main.route('/datasets')
+@login_required
+def dataset_list():
+    datasets = current_user.datasets.all()
+    return render_template('dataset_list.html', datasets=datasets)
+
+@main.route('/datasets/<int:id>')
+@login_required
+def dataset_detail(id):
+    dataset = Dataset.query.get_or_404(id)
+    fileurl = csvfiles.url(dataset.filename)
+    filepath = csvfiles.path(dataset.filename)
+    import csv
+    with open(filepath, 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        rows = [row for row in reader]
+    return render_template('dataset_detail.html', dataset=dataset, fileurl=fileurl, headers=rows[0], rows=rows[1:100])
+
+@main.route('/upload-dataset', methods=['GET', 'POST'])
+@login_required
+def upload_dataset():
+    form = UploadDatasetForm(user=current_user)
+    if form.validate_on_submit():
+        filename = csvfiles.save(request.files['file'])
+        dataset = Dataset(location_id=form.location.data,
+                          project_id=form.project.data,
+                          filename=filename,
+                      user_id=current_user.id)
+        db.session.add(dataset)
+        db.session.commit()
+        flash('The dataset has been uploaded.')
+        return redirect(url_for('.dataset_detail', id=dataset.id))
+    return render_template('upload_dataset.html', form=form)
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Location, db.session))
+admin.add_view(ModelView(Project, db.session))
+admin.add_view(ModelView(Dataset, db.session))

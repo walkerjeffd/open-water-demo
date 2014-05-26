@@ -2,4 +2,17 @@
 
 {% block page_content %}
     <h1>Hello, {{ user.name }}</h1>
+    <ul>
+        <li>Name: {{ user.name }}</li>
+        <li>Email: {{ user.email }}</li>
+        <li>Location: {{ user.location }}</li>
+        <li>About: {{ user.about }}</li>
+        <li>Datasets: 
+            <ul>
+                {% for dataset in user.datasets %}
+                    <li><a href="{{ url_for('.dataset_detail', id=dataset.id) }}">Dataset {{dataset.id}}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
 {% endblock %}

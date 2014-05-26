@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 3919f4e12ea
+Revision ID: 3048b6106057
 Revises: None
-Create Date: 2014-05-25 17:00:06.562000
+Create Date: 2014-05-25 18:09:50.977000
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '3919f4e12ea'
+revision = '3048b6106057'
 down_revision = None
 
 from alembic import op
@@ -31,12 +31,6 @@ def upgrade():
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
-    op.create_table('projects',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=64), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_projects_name'), 'projects', ['name'], unique=True)
     op.create_table('locations',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=True),
@@ -45,6 +39,12 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_locations_name'), 'locations', ['name'], unique=True)
+    op.create_table('projects',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=64), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_projects_name'), 'projects', ['name'], unique=True)
     op.create_table('parameters',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=16), nullable=True),
@@ -57,14 +57,16 @@ def upgrade():
     )
     op.create_table('datasets',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('filename', sa.String(length=128), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('location_id', sa.Integer(), nullable=True),
     sa.Column('project_id', sa.Integer(), nullable=True),
-    sa.Column('owner_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
-    sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('values',
@@ -85,10 +87,10 @@ def downgrade():
     op.drop_table('values')
     op.drop_table('datasets')
     op.drop_table('parameters')
-    op.drop_index(op.f('ix_locations_name'), table_name='locations')
-    op.drop_table('locations')
     op.drop_index(op.f('ix_projects_name'), table_name='projects')
     op.drop_table('projects')
+    op.drop_index(op.f('ix_locations_name'), table_name='locations')
+    op.drop_table('locations')
     op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
