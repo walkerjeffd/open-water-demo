@@ -29,15 +29,15 @@ def bootstrap():
     """Bootstrap database
     >> python manage.py bootstrap
     """
-    db.drop_all()
-    db.create_all()
-    user = User(email='jeff@walkerjeff.com',
-                username='jeff',
-                password='password',
-                confirmed=True,
-                name='Jeff Walker',
-                location='Brunswick, ME')
-    db.session.add(user)
+#     db.drop_all()
+#     db.create_all()
+#     user = User(email='jeff@walkerjeff.com',
+#                 username='jeff',
+#                 password='password',
+#                 confirmed=True,
+#                 name='Jeff Walker',
+#                 location='Brunswick, ME')
+#     db.session.add(user)
     location = Location(name='Androscoggin River',
                         latitude=43.9211128,
                         longitude=-69.9603785)
@@ -45,6 +45,13 @@ def bootstrap():
     project = Project(name="Jeff's Backyard")
     db.session.add(project)
     db.session.commit()
+
+@manager.command
+def deploy():
+    from flask.ext.migrate import upgrade
+
+    # migrate database to latest revision
+    upgrade()
 
 if __name__ == '__main__':
     manager.run()
