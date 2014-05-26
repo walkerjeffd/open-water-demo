@@ -11,17 +11,17 @@ This application runs on flask and is configured for deployment to Heroku. Data 
 
 Sensitive configuration settings must be set as environmental variables. These include:
 
-FLASK_CONFIG: Config class, e.g. development, production, heroku. see config.py
-DATABASE_URL: URI to database for SQLAlchemy
-SECRET_KEY: Flask secret key
-AWS_ACCESS_KEY_ID: Amazon AWS Access Key
-AWS_SECRET_ACCESS_KEY: Amazon AWS Secret Key
-S3_BUCKET: AWS S3 bucket name
-MAIL_SERVER: SMTP server name
-MAIL_PORT: SMTP port name
-MAIL_USE_TLS: SMTP TLS option (True/False)
-MAIL_USERNAME: SMTP username
-MAIL_PASSWORD: SMTP password
+- FLASK_CONFIG: Config class, e.g. development, production, heroku. see config.py  
+- DATABASE_URL: URI to database for SQLAlchemy  
+- SECRET_KEY: Flask secret key  
+- AWS_ACCESS_KEY_ID: Amazon AWS Access Key  
+- AWS_SECRET_ACCESS_KEY: Amazon AWS Secret Key  
+- S3_BUCKET: AWS S3 bucket name  
+- MAIL_SERVER: SMTP server name  
+- MAIL_PORT: SMTP port name  
+- MAIL_USE_TLS: SMTP TLS option (True/False)  
+- MAIL_USERNAME: SMTP username  
+- MAIL_PASSWORD: SMTP password  
 
 ## Development Server
 
